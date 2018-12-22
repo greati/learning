@@ -1,0 +1,202 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+
+\title{Convolutional Neural Networks}
+\subtitle{Deep Learning for Image classification}
+\author{Vitor Greati\inst{1}}
+\institute[]
+{
+	\inst{1}%
+	Federal University of Rio Grande do Norte
+}
+\date{}
+\subject{Computer Science}
+
+% Table of contents at the beginning of each section
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Table of contents at the beginning of each subsection
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}
+%    \frametitle{Table of Contents}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+\section{Basic concepts}
+
+    \subsection{Correlation and convolution}
+    \begin{frame}{Spatial Processes and Filters}
+
+        A \textbf{spatial domain process} on an image $f$ is defined as
+        \[
+            g = T[f]
+        \]
+        where $g$ is the output image, $T$ is an operation that
+        acts on a neighborhood centered at each $(x,y)$ in the domain
+        of $f$, and $g(x,y) = T[f,(x,y)]$.\\~\\
+
+        A \textbf{spatial filter} is made of two components:
+        \begin{itemize}
+            \item a neighborhood, commonly an odd dimensions' square;
+            \item an operation over the intensities in the neighborhood.
+        \end{itemize}
+       
+        A filtered image is generated as the center of the filter
+        visits each pixel.
+
+    \end{frame}
+
+    \begin{frame}{Correlation}
+
+        Correlation and convolution are operations characterized by
+        the sum of products of the elements of the filter
+        with the elements of the image.The difference between them
+        is subtle.\\~\\
+
+        Consider that $w$ is a filter of dimension $m \times n$. For the sake
+        of simplicity, guaranteeing a central pixel, $m$ and $n$ are odd natural numbers.
+        The \textbf{correlation} of $w$ with an image $f$ is given by:
+        \begin{equation}
+            w(x,y) \star f(x,y) = \sum\limits_{s=-a}^{a} \sum\limits_{t=-b}^{b} w(s,t)f(x+s, y+t)
+        \end{equation}
+        
+        where $a = \frac{m-1}{2}$ and $b = \frac{n-1}{2}$.
+    \end{frame}
+
+    \begin{frame}{Convolution}
+        The \textbf{convolution}, in turn, first demands $w$ to be rotated by $180^o$,
+        then performs the same task as correlation. The following equation
+        takes the same $m\times n$ filter $w$ and convolves it
+        with the image $f$. The rotation is performed in $f$ for the sake
+        of notational simplicity, which produces the same result as rotating the filter.
+
+        \begin{equation}
+            w(x,y) \bigstar f(x,y) = \sum\limits_{s=-a}^{a} \sum\limits_{t=-b}^{b} w(s,t)f(x - s, y - t)
+        \end{equation}
+
+        For Deep Learning, correlation is commonly preferred and is generally reffered as 
+        convolution, even if the mask is not actually rotated.
+    \end{frame}
+
+
+\section{Convolutional Neural Networks (CNNs)}
+
+    \subsection{Definitions}
+    \begin{frame}{Definitions}
+
+        \begin{block}{Convolutional Neural Networks}
+            Convolutional Neural Networks are neural networks
+            that swaps in a specialized convolutional layer in
+            place of fully connected layer for at least one of
+            the layers in the network.
+        \end{block}
+
+        CNNs don't use fully connected layers until the very last
+        layer(s) in the network.\\~\\
+
+        Each layer in the CNN
+        applies different sets of filters and combines the results,
+        feeding the next layer. During the training phase, 
+        the CNN \textbf{learns values for these filters}.
+            
+    \end{frame}
+
+    \begin{frame}{Main benefits}
+        \begin{block}{Local invariance}
+            Allows classifying an image as having certain
+            object regardless the location of the object in the
+            image, by means of \emph{pooling layers}.
+        \end{block}
+
+        \begin{block}{Compositionality}
+            Each filter composes a local path of lower-level features
+            into a higher-level representation, allowing
+            the network to learn richier features.
+        \end{block}
+    \end{frame}
+
+    \subsection{Motivation}
+    \begin{frame}{Defining filters hand}
+        Filters are generally \textbf{handmade} in order to achieve some
+        specific effect, like
+
+            \begin{itemize}
+                \item detecting edges;
+                \item blurring;
+                \item sharpening;
+                \item smoothing.
+            \end{itemize}
+
+        The question is: is there a way to \textbf{automatically} define these filters
+        aiming to detect objects and classify images?
+    \end{frame}
+
+    \begin{frame}{The convolutional way}
+        By applying convolution filters, nonlinear activation functions, pooling and backpropagation, Convolutional
+        Neural Networks are able to learn filters that can detect edges and blob-like structures in lower level layers
+        in the network, and then use the edges and structures for eventually detecting high-level objects
+        in the deeper layers.
+
+        \begin{block}{Why not simple MLPs?}
+            \begin{itemize}
+                \item MLPs do not scale well as image sizes increase.
+                \item Does not achieve high accuracies in complex problems (see CIFAR-10 dataset).
+            \end{itemize}
+        \end{block}
+    \end{frame}
+
+\subsection{Layers in CNNs}
+
+    \begin{frame}{Overview}{3D arrangement}
+        Layers in a CNN are organized in a 3D arrangement, where dimensions
+        correspond to the \textbf{width} and \textbf{height} of the image
+        and the \textbf{depth}, which is, for example, the number of channels in the image
+        or the amount of filters in the layer.\\~\\
+
+        These layers are not fully-connected like in MLPs: one layer connects
+        only a subset of its neurons to the subsequent layer, 
+        a property called \textbf{local connectivity}, which
+        is important for avoiding huge numbers of parameters in the network.\\~\\
+
+        The output layer has dimensions $1 \times 1 \times N$, where $N$ is the
+        number of classes, and the output vector represents the score for each class.
+
+    \end{frame}
+
+    \subsubsection{Layer types}
+    \begin{frame}{Layer types}
+        Examples of layer types are:
+        \begin{itemize}
+            \item \textbf{Convolutional} ({\bf \tt CONV})
+            \item \textbf{Activation} ({\tt ACT} or {\tt RELU})
+            \item \textbf{Pooling} ({\tt POOL})
+            \item \textbf{Fully-connected} ({\tt FC})
+            \item Batch Normalization ({\tt BN})
+            \item Dropout ({\tt DO})
+        \end{itemize}
+
+        \begin{block}{Describing a CNN architecture}
+            Use the general notation:
+
+            {\tt TYPE1 => TYPE2 => TYPE3 => \ldots => TYPEN} \\~\\
+            For example:
+
+            {\tt INPUT => CONV => RELU => FC => SOFTMAX} \\~\\
+        \end{block}
+    \end{frame}
+
+\end{document}

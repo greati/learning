@@ -1,0 +1,7 @@
+\beamer@sectionintoc {1}{Basic concepts}{2}{0}{1}
+\beamer@subsectionintoc {1}{1}{Correlation and convolution}{3}{0}{1}
+\beamer@sectionintoc {2}{Convolutional Neural Networks (CNNs)}{6}{0}{2}
+\beamer@subsectionintoc {2}{1}{Definitions}{7}{0}{2}
+\beamer@subsectionintoc {2}{2}{Motivation}{9}{0}{2}
+\beamer@subsectionintoc {2}{3}{Layers in CNNs}{11}{0}{2}
+\beamer@subsubsectionintoc {2}{3}{1}{Layer types}{12}{0}{2}
