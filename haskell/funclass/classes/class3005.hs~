@@ -1,0 +1,13 @@
+module Class3005 where
+
+{-    IO
+ -  /   \ 
+ - /     \
+ -IO a   nao
+ - |      |
+ - |     print it, where  print :: Show a => a -> IO ()
+ - |__ perform it
+ - 
+ - IO a is Mundo -> (Mundo, a)
+ -
+ -}

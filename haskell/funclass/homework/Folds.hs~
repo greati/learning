@@ -1,0 +1,40 @@
+module Folds where
+
+import Prelude hiding ((++),map,unzip,last,init)
+
+(++) xs ys = foldr (:) ys xs
+
+map :: (a -> b) -> [a] -> [b]
+map f = foldr (\x xs -> (f x) : xs) []
+
+sumlength :: Num a => [a] -> (a,a)
+sumlength = foldr (\x (s,l) -> (s+x,l+1)) (0,0)
+
+compose :: [a -> a] -> (a -> a)
+compose = foldl (.) id
+
+isort :: Ord a => [a] -> [a] 
+isort = foldr insert []
+    where   insert k [] = [k]
+            insert k (x:xs) = if k <= x then (k:x:xs) else x:insert k xs
+
+unzip :: [(a,b)] -> ([a],[b])
+unzip = foldr f ([],[])
+    where f (x,y) (xs,ys) = (x:xs, y:ys)
+
+last :: [a] -> a
+last xs = foldl (\_ r -> r) (head xs) xs
+
+init :: [a] -> [a]
+init xs = foldl f [] xs
+    where 
+        f :: [a] -> a -> [a]
+        f xs' k = if length xs' + 1 == length xs then xs' else xs' ++ [k]
+ 
+
+tail :: [a] -> [a]
+tail xs = foldr f [] xs
+    where 
+        f :: a -> [a] -> [a]
+        f k xs' = if length xs' + 1 == length xs then xs' else k:xs'
+                    

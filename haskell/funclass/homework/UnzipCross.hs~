@@ -1,0 +1,8 @@
+module UnzipCross where
+
+import qualified Prelude as P
+
+pair (f,g) (x,y) = (f x, g y)
+
+unzip = pair (P.map P.fst, P.map P.snd)
+cross (f,g) = pair (f P.. P.fst,g P.. P.snd)

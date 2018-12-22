@@ -1,0 +1,50 @@
+{-
+ - Derivação da fórmula de sin(3a)
+ -  lemma sin(2a) no caminho
+ -
+ - review: 
+ -
+ -
+ - data Nat = ?
+ -  soma, subtração, exponenciação, multiplicação
+ - data List = ?
+ -
+ - 
+ - Os seguintes diagramas comutam!
+ -
+ - A -------- f -----------> B
+ - | fst                     | fst
+ - A x C -------- cross ---> B x D
+ - | snd                     | snd
+ - C -------- g -----------> D
+ -
+ -
+ - A -------- f -------------> B
+ -                             | fst
+ - A -------- pair ------------> B x C
+ -                             | snd
+ - A -------- g -------------> C
+ - -}
+
+module Class16 where
+
+nats :: Integral a =>  [a]
+nats = 0 : map (+1) nats
+
+fibs :: Integral i => [i]
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+
+cross :: ((a -> b), (c -> d)) -> (a, c) -> (b, d)
+cross (f, g) (x, y) = (f x, g y)
+
+pair :: ((a -> b), (a -> c)) -> a -> (b, c)
+pair (f, g) x = (f x, g x)
+
+-- defining pair using the cross!
+pair' f g = (cross (f, g)) . dup
+
+dup x = (x,x)
+
+-- seeing properties...
+
+-- (map g) . (map f) = map (g . f)

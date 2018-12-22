@@ -1,0 +1,32 @@
+{- Syntax in functions
+ -
+ - - Pattern matching: specify patterns to which some data should conform
+ - and then check to see if it does and deconstructing the data
+ - according to some patterns.
+ -
+ - The best way is defining more specific first.
+ -
+ - _, :, (_,_)
+ -
+ -
+ - as patterns: allows defining an alias to a pattern:
+ - all@(x:xs), takes the list x:xs
+ -
+ - Guards.
+ -
+ - where after guards.
+ -
+ - Let ... in
+ -	let bindings are expressions themselves
+ -	where bindings are just syntactic constructs
+ - let in can be used locally as if then else
+ - let can be used inside list comprehensions
+ - let expressions are very local in their scope
+ -
+ - case
+ - case expression of pattern -> result
+ -					  pattern -> result
+ -					  pattern -> result
+ -					  pattern -> result
+ -
+ - -}

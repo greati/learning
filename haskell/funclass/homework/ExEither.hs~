@@ -1,0 +1,37 @@
+module ExEither where
+
+-- Do not alter this import!
+import Prelude hiding ( either, Either(..) )
+import qualified Data.Either as E
+
+data Either a b = Left a | Right b
+    deriving (Show, Eq)
+
+either :: (a -> c) -> (b -> c) -> Either a b -> c
+either f g (Left x) = f x
+either f g (Right x) = g x
+
+fromLeft :: a -> Either a b -> a
+fromLeft _ (Left v) = v
+fromLeft d _ = d
+
+fromRight :: b -> Either a b -> b
+fromRight _ (Left v) = v
+fromRight d _ = d
+
+isLeft :: Either a b -> Bool
+isLeft (Left _) = True
+isLeft _ = False
+
+isRight :: Either a b -> Bool
+isRight = not . isLeft
+
+lefts :: [Either a b] -> [a]
+lefts = map (\(Left x) -> x) . filter isLeft 
+
+partitionEithers :: [Either a b] -> ([a], [b])
+partitionEithers xs = (lefts xs, rights xs)
+
+rights :: [Either a b] -> [b]
+rights = map (\(Right x) -> x) . filter isRight 
+

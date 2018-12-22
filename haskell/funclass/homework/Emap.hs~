@@ -1,0 +1,5 @@
+module Emap where
+
+emap :: (a -> b) -> Either a -> Either b
+emap f (Left x) = Left (f x)
+emap f (Right x) = Right (f x)

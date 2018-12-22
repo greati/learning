@@ -1,0 +1,108 @@
+module ExMatrix
+where
+
+type Row a = [a]
+type Col a = [a]
+data Matrix a = Null | Append (Row a) (Matrix a)
+
+instance Show a => Show (Matrix a) where
+    show Null               = ""
+    show (Append xs Null)   = show xs 
+    show (Append xs m)      = show xs ++ "\n" ++ show m   
+
+matrix :: (Show a, Eq a, Num a, Fractional a) => [Row a] -> Matrix a
+matrix []       = error "empty matrix"
+matrix [[]]     = error "empty matrix"
+matrix [x]      = Append x Null 
+matrix (x:xs) 
+    | sx == sxs = Append x (matrix xs)
+    | otherwise = error "every row must have the same length"
+        where   sx  = length x
+                sxs = length $ head xs 
+
+dim :: Matrix a -> (Int, Int)
+dim (Append x Null) = (1, length x)
+dim (Append x m) = (1 + rows, cols)
+    where (rows, cols) = dim m
+
+elemAt :: Matrix a -> (Int, Int) -> a
+elemAt Null _ = error "index rows out of bounds"
+elemAt (Append [] m) (0,_) = error "index cols out of bounds"
+elemAt (Append (x:xs) m) (0,0) = x
+elemAt (Append (x:xs) m) (0,y) = elemAt (Append xs m) (0, y - 1)
+elemAt (Append r m) (x,y) = elemAt m (x - 1, y)
+
+(?) = elemAt
+
+add :: Num a => Matrix a -> Matrix a -> Matrix a
+add Null Null = Null
+add _ Null = error "incompatible rows quantity"
+add Null _ = error "incompatible rows quantity"
+add (Append x m) (Append y n) = Append (addrows x y) (add m n) 
+
+addrows :: Num a => Row a -> Row a -> Row a
+addrows [] []   = []
+addrows [] _    = error "incompatible columns quantity"
+addrows _  []   = error "incompatible columns quantity"
+addrows (x:xs) (y:ys) = x + y : addrows xs ys
+
+instance (Num a, Show a, Eq a, Fractional a) => Num (Matrix a) where
+    (+) = add
+    (*) = undefined
+    (-) = undefined
+    fromInteger = undefined
+    signum = undefined
+    abs = undefined
+
+rowAt :: Matrix a -> Int -> Row a
+rowAt Null _            = error "row out of index"
+rowAt (Append r m) 0    = r
+rowAt (Append r m) i    = rowAt m (i-1)
+
+colAt :: Matrix a -> Int -> Col a
+colAt Null          _   = []        
+colAt (Append r m)  i   = (r !! i) : colAt m i
+
+cols :: Matrix a -> [Col a]
+cols m = [colAt m i | i <- [0..snd (dim m)-1]]
+
+innerProd :: Num a => Row a -> Col a -> a
+innerProd [] []         = 0
+innerProd _ []          = error "incompatible dimensions"
+innerProd [] _          = error "incompatible dimensions"
+innerProd (x:xs) (y:ys) = x * y + innerProd xs ys
+
+prod :: Num a => Matrix a -> Matrix a -> Matrix a
+prod Null n         = Null
+prod (Append r m) n = Append (map (innerProd r) (cols n)) (prod m n)
+
+-- Constructor
+{-
+matrix :: (Show a, Eq a, Num a, Fractional a) => [[a]] -> Matrix a
+matrix xs
+    | xs == [] = error "The number of rows must be greater than 0."
+    | or (map (== []) xs) == True = error "Any row must have at least one element."
+    | and (map (== (length (head xs))) (map length (tail xs))) == False = error "Rows must have the same length."
+    | otherwise = Matrix xs
+
+instance Show a => Show (Matrix a) where
+    show (Matrix xs) = concat ([(show ks) ++ "\n" | ks <- init xs]) ++ show (last xs)
+
+instance (Num a, Show a, Eq a, Fractional a) => Num (Matrix a) where
+    --(+) (Matrix xs1) (Matrix xs2) = matrix [ map (\(x, y) -> x + y) (zip a b) | (a,b) <- (zip xs1 xs2)]
+    (+) (Matrix (x1:xs1)) (Matrix (x2:xs2)) = matrix ((map (\(x,y) -> x + y) (zip x1 x2)) : matrix xs1 + matrix xs2)
+    (*) = undefined
+    (-) = undefined
+    fromInteger = undefined
+    signum = undefined
+    abs = undefined
+
+dim :: Matrix a -> (Int, Int)
+dim (Matrix xs) = (length xs, length (xs !! 0))
+
+elemAt :: Matrix a -> (Int, Int) -> a
+elemAt (Matrix xs) (i, j) = (xs !! i) !! j 
+
+(#) :: Matrix a -> (Int, Int) -> a
+(#) = elemAt
+-}
